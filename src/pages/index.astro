@@ -1,25 +1,70 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			ul {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			ul li {
+				margin-bottom: 2.5em;
+			}
+			ul li h3 {
+				margin: 0 0 0.3em 0;
+				font-size: 1.3em;
+			}
+			ul li h3 a {
+				color: rgb(var(--black));
+				text-decoration: none;
+			}
+			ul li h3 a:hover {
+				text-decoration: underline;
+			}
+			ul li p {
+				margin: 0 0 0.3em 0;
+				color: rgb(var(--gray-dark));
+			}
+			.read-more {
+				color: var(--accent);
+				text-decoration: none;
+			}
+			.read-more:hover {
+				text-decoration: underline;
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>Welcome to My Blog</h1>
-			<p>
-				This is my personal blog where I share my thoughts, experiences, and things I learn along the way.
-			</p>
-			<p>
-				Feel free to browse my posts and get in touch if you have any questions or just want to chat!
-			</p>
+			<section>
+				<ul>
+					{
+						posts.map((post) => (
+							<li>
+								<h3>
+									<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+								</h3>
+								<p>{post.data.description}</p>
+								<a class="read-more" href={`/blog/${post.id}/`}>Read more…</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
 		</main>
 		<Footer />
 	</body>
